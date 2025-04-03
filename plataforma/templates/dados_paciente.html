@@ -1,0 +1,295 @@
+{% extends 'base_plataforma.html' %}
+{% load static %}
+{% block 'plataforma' %}
+    {% if messages %}
+        <br>
+        {% for message in messages %}
+            <div class="alert {{message.tags}}">
+                {{message}}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <br>
+    <div class="row">
+        <div class="col-md-3">
+            {% if paciente.sexo == "Masculino"%}
+                <img src="{% static 'plataforma/img/perfil2.png' %}">
+            {% else %}
+                <img src="{% static 'plataforma/img/perfil1.png' %}">
+            {% endif %}
+        </div>  
+        
+        <div class="col-md-3 dados descricao">
+            <h4>{{paciente.nome}}</h4>
+            <h6>{{paciente.datanascimento}}</h6>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#modal">
+
+        Adicionar dados do paciente
+
+    </button>
+
+    <br>
+
+    <br>
+
+    <table class="table table-striped">
+
+        <thead>
+
+            <tr>
+                <th scope="col">data</th>
+                
+                <th scope="col">Peso</th>
+
+                <th scope="col">QP</th>
+
+                <th scope="col">HMA</th>
+
+                <th scope="col">HPP</th>
+
+                <th scope="col">Antecedentes Pessoais e Familiares</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+            {% for dado in dados_paciente %}
+                <tr>
+                    <th scope="row">{{dado.data|date:"d/m/Y"}}</th>
+
+                    <th>{{dado.peso}}Kg</th>
+
+                    <td>{{dado.qp}}</td>
+
+                    <td>{{dado.hma}}</td>
+
+                    <td>{{dado.hpp}}</td>
+
+                    <td>{{dado.antecedentepf}}</td>
+
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+    <br>
+    <table class="table table-striped">
+
+        <thead>
+            
+            <tr>
+                <th scope="col">data</th>
+                <th scope="col">Exames fisicos</th>
+
+                <th scope="col">Exames Complementares</th>
+
+                <th scope="col">Diagnostico</th>
+
+                <th scope="col">Plano Terapeutico</th>
+
+            </tr>
+        
+        </thead>
+
+        <tbody>
+            {% for dado in dados_paciente %}
+                <tr>
+                    <th scope="row">{{dado.data|date:"d/m/Y"}}</th>
+
+                    <td> {{dado.exame_fisico}}  </td>
+
+                    <td> {{dado.exames_complementares}} </td>
+
+                    <td> {{dado.diagnostico}} </td>
+
+                    <td> {{dado.plano_terapeutico}} </td>
+
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        
+        <div class="modal-dialog" role="document">
+        
+            <div class="modal-content">
+        
+                <div class="modal-header">
+        
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        
+                        <span aria-hidden="true">&times;</span>
+        
+                    </button>
+        
+                </div>
+        
+                <div class="modal-body">
+        
+                    <form action="{% url 'dados_paciente' paciente.id %}" method="POST">{% csrf_token %}
+        
+                        <h4 class="titulo">Dados do Paciente</h4>
+        
+                        <div class="form-row">
+        
+                            <div class='col-md'>
+        
+                                <label for="validationServerUsername">Peso</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" placeholder="--" name="peso">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroupPrepend3">Kg</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='col-md'>
+                            <label for="validationServerUsername">QP</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="QP" name="qp">
+                                <div class="input-group-prepend">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-row">
+                        <div class='col-md'>
+                            <label for="validationServerUsername">HMA</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="HMA" name="hma">
+                                <div class="input-group-prepend">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class='col-md'>
+                            <label for="validationServerUsername">HPP</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="HPP" name="hpp">
+                                <div class="input-group-prepend">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <br>
+                    <div class="form-row">
+                        <div class='col-md'>
+                            <label for="validationServerUsername">Antecedentes Pessoais Familiares</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Antecedentes Pessoais Familiares" name="antecedentepf">
+                                
+                                <div class="input-group-prepend">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        
+                
+        
+        
+        <h4 class="titulo">Demais Exames</h4>
+        
+                        <div class="form-row">
+        
+                            <div class='col-md'>
+        
+                                <label for="validationServerUsername">Exame fisico</label>
+        
+                                <div class="input-group">
+        
+                                    <input type="text" placeholder="Exame Fisico..." class="form-control" name="exame_fisico">
+        
+                                    <div class="input-group-prepend">
+        
+                                    </div>
+        
+                                </div>
+        
+                            </div>
+        
+                            <div class='col-md'>
+        
+                                <label for="validationServerUsername">Exames Complementares</label>
+        
+                                <div class="input-group">
+        
+                                    <input type="text" placeholder="Exames Complementares..." class="form-control" name="exames_complementares">
+        
+                                    <div class="input-group-prepend">
+        
+                                    </div>
+        
+                                </div>
+        
+                            </div>
+        
+                        </div>
+        
+                        <br>
+        
+                        <div class="form-row">
+        
+                            <div class='col-md'>
+        
+                                <label for="validationServerUsername">Diagnostico</label>
+        
+                                <div class="input-group">
+        
+                                    <input type="text" placeholder="Diagnostico" class="form-control" name="diagnostico">
+        
+                                    <div class="input-group-prepend">
+        
+                                    </div>
+        
+                                </div>
+        
+                            </div>
+        
+                            <div class='col-md'>
+        
+                                <label for="validationServerUsername">Plano Terapeutico</label>
+        
+                                <div class="input-group">
+        
+                                    <input type="text" placeholder="Plano Terapeutrico..." class="form-control" name="plano_terapeutico">
+        
+                                    <div class="input-group-prepend">
+        
+                                    </div>
+        
+                                </div>
+        
+                            </div>
+        
+                        </div>
+        
+                        <br>
+        
+                        <input type="submit" value="Cadastrar" class="btn btn-success">
+        
+                    </form>
+        
+                </div>
+        
+            </div>
+        
+        </div>
+        
+    </div>
+
+
+{% endblock%}
