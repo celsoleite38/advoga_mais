@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .utils import password_is_valid, email_html
 from django.shortcuts import redirect, get_object_or_404
@@ -8,8 +8,11 @@ from django.contrib import messages
 from django.contrib import auth
 import os
 from django.conf import settings
-from .models import Ativacao
+from .models import Ativacao, PerfilProfissional
 from hashlib import sha256
+from django.contrib.auth.decorators import login_required
+from .forms import PerfilProfissionalForm
+
 
 def cadastro(request):
     if request.method == "GET":
@@ -28,6 +31,7 @@ def cadastro(request):
         try:
             user = User.objects.create_user(username=username,
                                         password=senha,
+                                        email=email,
                                         is_active=False)
             user.save()
             token = sha256(f"{username}{email}".encode()).hexdigest()
@@ -78,3 +82,20 @@ def ativar_conta(request, token):
     token.save()
     messages.add_message(request, constants.SUCCESS, 'CONTA ATIVADA COM SUCESSO')
     return redirect('/auth/logar')
+
+
+
+
+@login_required
+def editar_perfil_profissional(request):
+    perfil, _ = PerfilProfissional.objects.get_or_create(usuario=request.user)
+
+    if request.method == 'POST':
+        form = PerfilProfissionalForm(request.POST, request.FILES, instance=perfil)
+        if form.is_valid():
+            form.save()
+            return redirect('pacientes')  # ou qualquer outra página
+    else:
+        form = PerfilProfissionalForm(instance=perfil)
+
+    return render(request, 'editar_perfil_profissional.html', {'form': form})

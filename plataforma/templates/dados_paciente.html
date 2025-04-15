@@ -30,10 +30,16 @@
 
     <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#modal">
 
-        Adicionar dados do paciente
+        🧾 Adicionar dados do paciente
 
     </button>
-
+    <strong>
+    <button class="btn btn-outline-success" onclick="window.location.href='{% url 'imprimir_dados_paciente' paciente.id %}'">
+        
+        🖨️ Imprimir Dados do Paciente
+        
+    </strong>
+    </button>
     <br>
 
     <br>

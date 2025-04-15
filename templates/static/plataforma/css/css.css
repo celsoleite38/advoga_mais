@@ -48,3 +48,14 @@
     max-width: 100%;
     overflow-x: hidden;
 }
+
+.footer-print {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ajusta a altura para ocupar toda a tela */
+}
+
+.assinatura {
+    text-align: center; /* Centraliza o texto dentro da assinatura */
+}

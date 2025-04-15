@@ -12,19 +12,16 @@
     {% endif %}
 
 <br>
+<h1 class="titulo">Escolha um Paciente <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#modal">
+    Novo Paciente
+    </button></h1>
 
 
-
-<h1 class="titulo">Escolha um Paciente</h1>
-
-<button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#modal">
-    🧾 Novo Paciente
-</button>
-
+<br>
 <div class="row">
     {% for paciente in pacientes %}
         <div class="col-md-4">
-             
+            <a href="{% url 'editar_paciente' paciente.pk %}" class="link-hover"> 
                 <div class="card-paciente">
                     <div class="foto-perfil">
                         {% if paciente.sexo == "Masculino" %}
@@ -33,28 +30,27 @@
                             <img src="{% static 'plataforma/img/perfil1.png' %}">
                         {% endif %}
                     </div>
-
+                    <br>
                     <p class="dados">{{paciente.nome}}</p>
                     <p class="dados">{{paciente.cpf}}</p>
                    <p class="dados">{{paciente.datanascimento}}</p>
+                    
+                    
                     <p class="dados"> <span id="dataNascimento" hidden >{{ paciente.datanascimento|date:"y-m-d" }}</span></p>
                     <p class="dados">Idade: <span id="idade"></span> anos</p>
+                    
 
                     <p class="dados">{{paciente.email}}</p>
-                    <p class="dados">{{paciente.estadocivil}}</p>
-                    <p class="dados">{{paciente.sexo}}</p>
                     <p class="dados">{{paciente.telefone}}</p>
-                    <p class="dados">{{paciente.naturalidade}}</p>
-                    <p class="dados">{{paciente.profissao}}</p>
                     <p class="dados">{{paciente.endereco}}</p>
+                    <button type="button" class="btn btn-primary">
+                        Editar
+                    </button>
+                    
 
-                    <a href="{% url 'editar_paciente' paciente.pk %}" class="link-hover">
-                        <button type="button" class="btn btn-primary">
-                            Editar
-                        </button>
-                    </a>
                 </div>
-                
+            </a>
+            
         </div>
         
         

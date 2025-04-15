@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.urls import reverse
+from autenticacao.models import PerfilProfissional
 from .models import Pacientes, DadosPaciente, Evolucao
 from datetime import date, datetime
 from .forms import PacienteForm, EvolucaoForm
@@ -229,3 +230,52 @@ def imprimir_paciente(request, id):
     p.save()
 
     return response
+
+
+#impressao de relatorio - evoluções
+def imprimir_evolucoes(request, paciente_id):
+    paciente = get_object_or_404(Pacientes, id=paciente_id)
+    perfil = PerfilProfissional.objects.filter(usuario=request.user).first()
+
+    if request.method == 'POST':
+        ids_selecionados = request.POST.getlist('evolucoes')
+        
+        if ids_selecionados:
+            evolucoes = Evolucao.objects.filter(id__in=ids_selecionados)
+        else:
+            evolucoes = Evolucao.objects.filter(paciente=paciente)
+        
+         # 🔽 Aqui busca o perfil do fisioterapeuta logado
+        perfil = PerfilProfissional.objects.filter(usuario=request.user).first()
+        
+        return render(request, 'relatorio_impressao.html', {
+            'paciente': paciente,
+            'evolucoes': evolucoes,
+            'today': date.today(),
+            'perfil': perfil
+        })
+    
+    else:
+        evolucoes = Evolucao.objects.filter(paciente=paciente)
+        return render(request, 'selecionar_evolucoes.html', {
+            'paciente': paciente,
+            'evolucoes': evolucoes
+        })
+
+
+@login_required(login_url='/auth/logar/')
+def imprimir_dados_paciente(request, id):
+    paciente = get_object_or_404(Pacientes, id=id)
+    dados_paciente = DadosPaciente.objects.filter(paciente=paciente)
+    if not paciente.fisio == request.user:
+        messages.add_message(request, constants.ERROR, 'Acesso negado a este PACIENTE. ')
+        return redirect('/dados_paciente/')
+    if request.method == 'POST':
+        # Não há nada a fazer aqui, pois não estamos lidando com formulários
+        pass
+    else:
+        return render(request, 'imprimir_dados_paciente.html', {
+            'paciente': paciente,
+            'dados_paciente': dados_paciente,
+            'today': date.today()
+        })

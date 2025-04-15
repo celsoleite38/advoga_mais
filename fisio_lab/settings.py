@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'autenticacao.context_processors.perfil_profissional',
             ],
         },
     },
@@ -148,3 +149,9 @@ MESSAGE_TAGS = {
 #email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST_USER = 'josecelsoleite@gmail.com'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # ou smtp.gmail.com, etc.
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = 'Etpv$910tbr!'
+DEFAULT_FROM_EMAIL = 'Fisio-Minas <noreply@seudominio.com>'

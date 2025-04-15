@@ -29,15 +29,15 @@
 
     <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#modal">
 
-        + Nova Evolução
+        🧾 Nova Evolução
 
     </button>
 
-    <button type="button" class="btn btn-outline-primary">
-
-        Exportar refeição
-
-    </button>
+    
+    <a href="{% url 'imprimir_evolucoes' paciente.id %}" class="btn btn-outline-success" >
+        🖨️ Imprimir Evoluções
+    </a>
+    
 
     <br>  
 
