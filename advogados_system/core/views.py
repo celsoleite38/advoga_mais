@@ -6,7 +6,7 @@ from processos.models import Processo
 from agenda.models import Audiencia
 from usuarios.utils import advogado_dono  # 1. IMPORTE A FUNÇÃO 'advogado_dono'
 from django.utils.timezone import now
-
+from django.db import models
 @login_required
 def dashboard(request):
     # 2. IDENTIFIQUE O DONO DA CONTA (seja o advogado ou o chefe do colaborador)
@@ -16,13 +16,15 @@ def dashboard(request):
     # 3. USE 'dono_da_conta' EM TODAS AS BUSCAS NO BANCO DE DADOS
     processos_recentes = Processo.objects.filter(advogado_responsavel=dono_da_conta).order_by('-data_cadastro')[:10]
     
-    proximas_audiencias = Audiencia.objects.filter(
-        processo__advogado_responsavel=dono_da_conta,
+    compromissos = Audiencia.objects.filter(
+        models.Q(processo__advogado_responsavel=dono_da_conta) |  # Compromissos com processo
+        models.Q(cliente__advogado_responsavel=dono_da_conta)     # Compromissos diretos com clientes
+    ).filter(
         data_hora__gte=hoje
-    ).order_by('data_hora')[:10]  # próximas 10 audiências
+    ).order_by('data_hora')[:10]
 
     context = {
         'processos': processos_recentes,
-        'audiencias': proximas_audiencias
+        'compromissos': compromissos
     }
     return render(request, 'core/dashboard.html', context)

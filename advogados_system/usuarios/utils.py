@@ -7,30 +7,36 @@ from django.shortcuts import redirect
 # ----------------------------------------------------------------
 # Função 1: exige_permissao (Versão limpa, sem diagnóstico)
 # ----------------------------------------------------------------
-def exige_permissao(permissao_necessaria):
+def exige_permissao(permissao_necessaria, redirect_to='core:dashboard'):
+    """
+    Decorator que verifica permissões de forma mais robusta
+    Args:
+        permissao_necessaria (str): Nome da permissão requerida
+        redirect_to (str): Nome da URL para redirecionamento em caso de falha
+    """
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
-            from django.http import HttpRequest
-            if not isinstance(request, HttpRequest ):
-                real_request = args[0]
-            else:
-                real_request = request
-
-            user = real_request.user
-
+            # Verificação simplificada do usuário
+            if not hasattr(request, 'user'):
+                messages.error(request, 'Sessão inválida')
+                return redirect(redirect_to)
+            
+            user = request.user
+            
+            # Advogados têm acesso completo
             if user.is_authenticated and user.tipo_usuario == 'ADV':
                 return view_func(request, *args, **kwargs)
-
+            
+            # Verificação para colaboradores
             if user.is_authenticated and user.tipo_usuario == 'COLAB':
                 colaborador = getattr(user, 'colaborador_vinculado', None)
-                if colaborador:
-                    permissoes = getattr(colaborador, 'permissoes', None)
-                    if permissoes and getattr(permissoes, permissao_necessaria, False):
-                        return view_func(request, *args, **kwargs)
-
-            messages.error(real_request, 'Você não tem permissão para acessar esta funcionalidade.')
-            return redirect('usuarios:dashboard')
+                if colaborador and getattr(colaborador.permissoes, permissao_necessaria, False):
+                    return view_func(request, *args, **kwargs)
+            
+            messages.error(request, f'Acesso negado. Permissão requerida: {permissao_necessaria}')
+            return redirect(redirect_to)
+        
         return _wrapped_view
     return decorator
 

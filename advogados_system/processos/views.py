@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.utils.decorators import method_decorator
-from django.shortcuts import redirect
 from django.db.models import Q
 
 from usuarios.utils import exige_permissao, advogado_dono
@@ -11,12 +10,14 @@ from usuarios.models import PermissaoColaborador
 from .models import Processo, Andamento
 from .forms import ProcessoForm, AndamentoForm
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import redirect
-from usuarios.utils import advogado_dono
-from .models import Processo
+from django.urls import reverse
+from django.views.generic.edit import FormMixin # 1. IMPORTE O FORMMIXIN
+
+from django.views.generic import DetailView
+
 
 
 @method_decorator(exige_permissao('cadastrar_processo'), name='dispatch')
@@ -37,34 +38,23 @@ class ProcessoCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-@method_decorator(exige_permissao('editar_processo'), name='dispatch')
-class ProcessoUpdateView(LoginRequiredMixin, UpdateView):
+@method_decorator(exige_permissao('editar_processo', redirect_to='processos:lista'), name='dispatch')
+class ProcessoUpdateView(UpdateView):
     model = Processo
     form_class = ProcessoForm
     template_name = 'processos/processo_form.html'
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
-
-    def dispatch(self, request, *args, **kwargs):
-        processo = self.get_object()
-        if processo.advogado_responsavel != advogado_dono(request):
-            messages.error(request, "Você não tem permissão para editar este processo.")
-            return redirect('processos:detalhe_processo', pk=self.object.pk)
-
-        return super().dispatch(request, *args, **kwargs)
-
+    
+    def get_queryset(self):
+        """Filtra apenas processos do advogado responsável"""
+        return super().get_queryset().filter(advogado_responsavel=advogado_dono(self.request))
+    
     def get_success_url(self):
-        return reverse_lazy('processos:lista')
+        messages.success(self.request, "Processo atualizado com sucesso!")
+        return reverse('processos:detalhe_processo', kwargs={'pk': self.object.pk})
 
 
 
-from django.views.generic import DetailView
-from django.views.generic.edit import FormMixin # 1. IMPORTE O FORMMIXIN
-from .forms import AndamentoForm # 2. IMPORTE O ANDAMENTOFORM
-from .models import Processo # Garanta que Processo está importado
+
 
 @method_decorator(exige_permissao('visualizar_processo'), name='dispatch')
 class ProcessoDetailView(LoginRequiredMixin, FormMixin, DetailView): # 3. ADICIONE FORMMIXIN

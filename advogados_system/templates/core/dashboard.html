@@ -34,8 +34,18 @@
                 </div>
                 <div class="card-body">
                     <ul>
-                        {% for audiencia in audiencias %}
-                        <li>{{ audiencia.data_hora|date:"d/m/Y H:i" }} - {{ audiencia.tipo }} - {{ audiencia.processo.cliente.nome }}</li>
+                        {% for compromisso in compromissos %}
+                            <li>
+                            {{ compromisso.data_hora|date:"d/m/Y H:i" }} - 
+                            {{ compromisso.tipo }} - 
+                            {% if compromisso.processo %}
+                                 {{ compromisso.processo.cliente.nome }}
+                            {% else %}
+                                 {{ compromisso.cliente.nome }}
+                            {% endif %}
+                            </li>
+                        {% empty %}
+                            <li>Nenhum compromisso agendado.</li>
                         {% endfor %}
                         
                     </ul>
